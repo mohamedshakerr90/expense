@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="location_numbers_view_list" model="ir.ui.view">
+    <field name="name">location.numbers.view.list</field>
+    <field name="model">location.numbers</field>
+    <field name="arch" type="xml">
+      <tree string="Location Numbers" editable="bottom" create="true" edit="true" delete="true">
+        <field name="name"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="action_location_numbers" model="ir.actions.act_window">
+    <field name="name">Location Numbers</field>
+    <field name="res_model">location.numbers</field>
+    <field name="view_mode">tree</field>
+    <field name="view_id" ref="location_numbers_view_list"/>
+    <field name="target">current</field>
+  </record>
+
+  <menuitem id="menu_location_numbers" name="Location Numbers"
+            parent="account.menu_analytic_accounting"
+            sequence="2" action="action_location_numbers"/>
+</odoo>

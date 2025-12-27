@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Define new HR Expense Admins group -->
+        <record id="group_hr_expense_admins" model="res.groups">
+            <field name="name">HR Expense Admins</field>
+            <field name="category_id" ref="base.module_category_human_resources_expenses"/>
+            <field name="implied_ids" eval="[(4, ref('hr_expense.group_hr_expense_manager'))]"/>
+            <field name="comment">Members of this group have full administrative access to all expense records.</field>
+        </record>
+        <!-- Record rule for hr.expense: HR Expense Admins have full access to all records -->
+        <record id="hr_expense_manager_access_rule" model="ir.rule">
+            <field name="name">HR Expense: Admin Full Access</field>
+            <field name="model_id" ref="hr_expense.model_hr_expense"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="groups" eval="[(4, ref('expenses_customization.group_hr_expense_admins'))]"/>
+        </record>
+
+        <!-- Record rule for hr.expense: Limited access for regular users -->
+        <record id="hr_expense_user_access_rule" model="ir.rule">
+            <field name="name">HR Expense: User Access Rule</field>
+            <field name="model_id" ref="hr_expense.model_hr_expense"/>
+            <field name="domain_force">['|', '|', 
+                ('employee_id.user_id', '=', user.id),
+                ('product_id.approve_user', '=', user.id),
+                ('analytic_approve_user_ids', 'in', [user.id])
+            ]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="groups" eval="[(4, ref('base.group_user')),(4, ref('hr_expense.group_hr_expense_user')),(4, ref('hr_expense.group_hr_expense_team_approver')),(4, ref('hr_expense.group_hr_expense_team_approver'))]"/>
+        </record>
+    </data>
+</odoo>

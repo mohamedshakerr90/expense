@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id='hr_expense_view_form_inherit_documents_hr_expense' model='ir.ui.view'>
+    <field name="name">hr.expense.view.form.inherit.documents.hr.expense</field>
+    <field name="model">hr.expense</field>
+    <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+    <field name="arch" type="xml">
+      <field name="state" position="attributes">
+        <attribute name="statusbar_visible">draft,category_approve,project_approve,approved,done,gm_approve</attribute>
+      </field>
+      <field name="analytic_distribution" position="after">
+        <field name="employee_analytic_account_ids" invisible="1" widget="many2many_tags"/>
+        <field name="analytic_approve_user_ids" invisible="1" widget="many2many_tags"/>
+        <field name="location_numbers_required" invisible="1"/>
+        <field name="analytic_location_numbers_ids" invisible="1"/>
+        <field name="location_numbers_id" required="location_numbers_required" options="{'no_create': True, 'no_edit': True}" domain="[('id', 'in', analytic_location_numbers_ids)]" invisible="not location_numbers_required"/>
+        <field name="show_category_approve_button" invisible="1"/>
+        <field name="show_project_approve_button" invisible="1"/>
+        <field name="vendor_name" invisible="not tax_ids" required="tax_ids" force_save="1"/>
+        <field name="vat" invisible="not tax_ids" required="tax_ids" force_save="1"/>
+        <field name="invoice_number" invisible="not tax_ids" required="tax_ids" force_save="1"/>
+      </field>
+      <header position="inside">
+        <button name="action_confirm_approve" type="object" string="Confirm" invisible="state != 'draft'" class="btn-primary"/>
+        <button name="action_category_approve" type="object" string="Category Approve" class="btn-primary" invisible="not show_category_approve_button"/>
+        <button name="action_project_approve" type="object" string="Project Approve" class="btn-primary" invisible="not show_project_approve_button"/>
+      </header>
+    </field>
+  </record>
+  <record id='account_analytic_account_view_form_inherit' model='ir.ui.view'>
+    <field name="name">analytic.analytic.account.form.inherit</field>
+    <field name="model">account.analytic.account</field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+    <field name="arch" type="xml">
+      <field name="code" position="after">
+        <field name="location_numbers_ids" widget="many2many_tags"/>
+        <field name="approve_employee"/>
+        <field name="approve_user" invisible="1"/>
+      </field>
+    </field>
+  </record>
+
+  <record id='hr_employee_view_form_inherit' model='ir.ui.view'>
+    <field name="name">hr.employee.view.form.inherit</field>
+    <field name="model">hr.employee</field>
+    <field name="inherit_id" ref="hr.view_employee_form"/>
+    <field name="arch" type="xml">
+      <field name="department_id" position="after">
+        <field name="analytic_account_ids" widget="many2many_tags"/>
+        <field name="expense_journal_id"/>
+        <field name="expense_payment_method_line_id" invisible="1" force_save="1"/>
+      </field>
+    </field>
+  </record>
+
+  <record id="product_product_view_form_inherit" model="ir.ui.view">
+    <field name="name">product.template.expense</field>
+    <field name="model">product.product</field>
+    <field name="inherit_id" ref="hr_expense.product_product_expense_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='supplier_taxes_id']" position="after">
+        <field name="approve_user" options="{'no_quick_create': True}"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="action_gm_approve" model="ir.actions.server">
+    <field name="name">GM Approve</field>
+    <field name="model_id" ref="hr_expense.model_hr_expense"/>
+    <field name="binding_model_id" ref="hr_expense.model_hr_expense"/>
+    <field name="binding_view_types">form,list</field>
+    <field name="state">code</field>
+    <field name="code">
+records = env['hr.expense'].browse(env.context.get('active_ids', []))
+records.action_gm_approve()
+      </field>
+  </record>
+</odoo>
